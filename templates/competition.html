@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1 class="display-4">{{ competition.name }}</h1>
+    <p class="lead">{{ competition.description }}</p>
+    <ul class="list-group">
+        {% for solution in solutions %}
+        <li class="list-group-item">{{ solution.name }} - {{ solution.status }}</li>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('submit_solution') }}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="solutionFile">Submit your solution</label>
+            <input type="file" class="form-control" id="solutionFile" name="solutionFile" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+{% endblock %}
