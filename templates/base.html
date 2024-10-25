@@ -11,7 +11,7 @@
     <a class="navbar-brand" href="#">Navbar</a>
     <div class="collapse navbar-collapse">
         <ul class="navbar-nav ml-auto">
-            {% if logged_in %}
+            {% if session.get('user_id') %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
             </li>
@@ -19,12 +19,17 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('login') }}">Login</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+            </li>
             {% endif %}
         </ul>
     </div>
 </nav>
-{% block content %}
-{% endblock %}
+<div class="container mt-3">
+    {% block content %}
+    {% endblock %}
+</div>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

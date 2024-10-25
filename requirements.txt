@@ -2,6 +2,6 @@ Flask
 flask_sqlalchemy
 flask_migrate
 python-dotenv
-sklearn
+scikit-learn
 celery
 psycopg2-binary

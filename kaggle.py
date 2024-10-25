@@ -20,6 +20,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL',
                                                   'postgresql+psycopg2://username:password@localhost:5432/mydatabase')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'your_secret_key')
+app.config['PORT'] = int(os.getenv('PORT', 8000))
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -60,8 +61,8 @@ class Competition(db.Model):
 
 class Solution(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user_model.id'), nullable=False)
-    competition_id = db.Column(db.Integer, db.ForeignKey('competition_model.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    competition_id = db.Column(db.Integer, db.ForeignKey('competition.id'), nullable=False)
     file_path = db.Column(db.String(120), nullable=False)
     result = db.Column(db.Text(), nullable=True)
 
@@ -71,6 +72,11 @@ class Solution(db.Model):
     def __repr__(self):
         return f'<Solution {self.id}>'
 
+@app.route('/')
+def index():
+    if session.get('user_id'):
+        return redirect(url_for('competitions'))
+    return redirect(url_for('login'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -84,7 +90,7 @@ def register():
         if User.query.filter_by(username=username).first():
             return render_template('register.html', error='Username already exists')
 
-        hashed_password = generate_password_hash(password, method='sha256')
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         new_user = User(username=username, password_hash=hashed_password)
 
         db.session.add(new_user)
@@ -111,6 +117,11 @@ def login():
         return redirect(url_for('competitions'))
     return render_template('login.html')
 
+
+@app.route('/logout')
+def logout():
+    session.pop('user_id', None)
+    return redirect(url_for('login'))
 
 @app.route('/competitions', methods=['GET'])
 @require_auth
@@ -190,4 +201,4 @@ def validate_model_task(solution_id):
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
-    app.run(debug=True)
+    app.run(debug=True, port=app.config['PORT'])
